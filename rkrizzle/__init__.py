@@ -58,6 +58,7 @@ __copyright__ = 'Copyright 2015 Kenneth Reitz'
 
 from urllib3.contrib import pyopenssl
 pyopenssl.inject_into_urllib3()
+import urllib3.exceptions
 
 __all__ = (
     'PreparedRequest',
@@ -99,3 +100,20 @@ import warnings
 
 # FileModeWarnings go off per the default.
 warnings.simplefilter('default', FileModeWarning, append=True)
+
+# this urllib3 warning is evil, as it expresses a warning about a cert
+# that quite literally the user cannot do anything about
+warnings.filterwarnings(
+    'ignore', category=urllib3.exceptions.SubjectAltNameWarning)
+
+# this warning tells you to use a newer python, which may not be a choice
+# for you, or to use pyOpenSSL, which we always use in rkrizzle
+warnings.filterwarnings(
+    'ignore', category=urllib3.exceptions.InsecurePlatformWarning)
+
+# There are two paths to SSL in rkrizzle - either you explicitly said
+# "I am making an insecure connection" - in which case the warning here
+# is just annoying and not helping anything, OR you have not said it's
+# insecure in which case we're going to hard-fail.
+warnings.filterwarnings(
+    'ignore', category=urllib3.exceptions.InsecureRequestWarning)
