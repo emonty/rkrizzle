@@ -1,6 +1,7 @@
-py==1.4.30
-pytest==2.8.1
-pytest-cov==2.1.0
-pytest-httpbin==0.0.7
-httpbin==0.4.0
-wheel
+pbr>=0.11,<2.0
+
+urllib3>=1.12
+chardet>=2.3.0
+pyOpenSSL>=0.13
+ndg-httpsclient>=0.4.0
+pyasn1>=0.1.9

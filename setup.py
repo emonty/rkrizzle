@@ -1,74 +1,21 @@
 #!/usr/bin/env python
+# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import os
-import re
-import sys
+import setuptools
 
-from codecs import open
-
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-if sys.argv[-1] == 'publish':
-    os.system('python setup.py sdist upload')
-    sys.exit()
-
-packages = [
-    'requests',
-    'requests.packages',
-    'requests.packages.chardet',
-    'requests.packages.urllib3',
-    'requests.packages.urllib3.packages',
-    'requests.packages.urllib3.contrib',
-    'requests.packages.urllib3.util',
-    'requests.packages.urllib3.packages.ssl_match_hostname',
-]
-
-requires = []
-
-version = ''
-with open('requests/__init__.py', 'r') as fd:
-    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
-                        fd.read(), re.MULTILINE).group(1)
-
-if not version:
-    raise RuntimeError('Cannot find version information')
-
-with open('README.rst', 'r', 'utf-8') as f:
-    readme = f.read()
-with open('HISTORY.rst', 'r', 'utf-8') as f:
-    history = f.read()
-
-setup(
-    name='requests',
-    version=version,
-    description='Python HTTP for Humans.',
-    long_description=readme + '\n\n' + history,
-    author='Kenneth Reitz',
-    author_email='me@kennethreitz.com',
-    url='http://python-requests.org',
-    packages=packages,
-    package_data={'': ['LICENSE', 'NOTICE'], 'requests': ['*.pem']},
-    package_dir={'requests': 'requests'},
-    include_package_data=True,
-    install_requires=requires,
-    license='Apache 2.0',
-    zip_safe=False,
-    classifiers=(
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Natural Language :: English',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-    ),
-    extras_require={
-        'security': ['pyOpenSSL>=0.13', 'ndg-httpsclient', 'pyasn1'],
-    },
-)
+setuptools.setup(
+    setup_requires=['pbr'],
+    pbr=True)
