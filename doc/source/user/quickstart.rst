@@ -3,14 +3,14 @@
 Quickstart
 ==========
 
-.. module:: requests.models
+.. module:: rkrizzle.models
 
 Eager to get started? This page gives a good introduction in how to get started
 with Requests.
 
 First, make sure that:
 
-* Requests is :ref:`installed <install>`
+* Rkrizzle is :ref:`installed <install>`
 
 Let's get started with some simple examples.
 
@@ -18,11 +18,11 @@ Let's get started with some simple examples.
 Make a Request
 --------------
 
-Making a request with Requests is very simple.
+Making a request with Rkrizzle is very simple.
 
-Begin by importing the Requests module::
+Begin by importing the Rkrizzle module::
 
-    >>> import requests
+    >>> import rkrizzle
 
 Now, let's try to get a webpage. For this example, let's get GitHub's public
 timeline ::
@@ -35,15 +35,15 @@ get all the information we need from this object.
 Requests' simple API means that all forms of HTTP request are as obvious. For
 example, this is how you make an HTTP POST request::
 
-    >>> r = requests.post("http://httpbin.org/post", data = {"key":"value"})
+    >>> r = rkrizzle.post("http://httpbin.org/post", data = {"key":"value"})
 
 Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and
 OPTIONS? These are all just as simple::
 
-    >>> r = requests.put("http://httpbin.org/put", data = {"key":"value"})
-    >>> r = requests.delete("http://httpbin.org/delete")
-    >>> r = requests.head("http://httpbin.org/get")
-    >>> r = requests.options("http://httpbin.org/get")
+    >>> r = rkrizzle.put("http://httpbin.org/put", data = {"key":"value"})
+    >>> r = rkrizzle.delete("http://httpbin.org/delete")
+    >>> r = rkrizzle.head("http://httpbin.org/get")
+    >>> r = rkrizzle.options("http://httpbin.org/get")
 
 That's all well and good, but it's also only the start of what Requests can
 do.
@@ -61,7 +61,7 @@ Requests allows you to provide these arguments as a dictionary, using the
 following code::
 
     >>> payload = {'key1': 'value1', 'key2': 'value2'}
-    >>> r = requests.get("http://httpbin.org/get", params=payload)
+    >>> r = rkrizzle.get("http://httpbin.org/get", params=payload)
 
 You can see that the URL has been correctly encoded by printing the URL::
 
@@ -74,7 +74,7 @@ URL's query string.
 You can also pass a list of items as a value::
 
     >>> payload = {'key1': 'value1', 'key2': ['value2', 'value3']}
-    >>> r = requests.get("http://httpbin.org/get", params=payload)
+    >>> r = rkrizzle.get("http://httpbin.org/get", params=payload)
     >>> print(r.url)
     http://httpbin.org/get?key1=value1&key2=value2&key2=value3
 
@@ -84,12 +84,12 @@ Response Content
 We can read the content of the server's response. Consider the GitHub timeline
 again::
 
-    >>> import requests
-    >>> r = requests.get('https://api.github.com/events')
+    >>> import rkrizzle
+    >>> r = rkrizzle.get('https://api.github.com/events')
     >>> r.text
     u'[{"repository":{"open_issues":0,"url":"https://github.com/...
 
-Requests will automatically decode content from the server. Most unicode
+Rkrizzle will automatically decode content from the server. Most unicode
 charsets are seamlessly decoded.
 
 When you make a request, Requests makes educated guesses about the encoding of
@@ -101,7 +101,7 @@ using, and change it, using the ``r.encoding`` property::
     'utf-8'
     >>> r.encoding = 'ISO-8859-1'
 
-If you change the encoding, Requests will use the new value of ``r.encoding``
+If you change the encoding, Rkrizzle will use the new value of ``r.encoding``
 whenever you call ``r.text``. You might want to do this in any situation where
 you can apply special logic to work out what the encoding of the content will
 be. For example, HTTP and XML have the ability to specify their encoding in
@@ -109,7 +109,7 @@ their body. In situations like this, you should use ``r.content`` to find the
 encoding, and then set ``r.encoding``. This will let you use ``r.text`` with
 the correct encoding.
 
-Requests will also use custom encodings in the event that you need them. If
+Rkrizzle will also use custom encodings in the event that you need them. If
 you have created your own encoding and registered it with the ``codecs``
 module, you can simply use the codec name as the value of ``r.encoding`` and
 Requests will handle the decoding for you.
@@ -137,8 +137,8 @@ JSON Response Content
 
 There's also a builtin JSON decoder, in case you're dealing with JSON data::
 
-    >>> import requests
-    >>> r = requests.get('https://api.github.com/events')
+    >>> import rkrizzle
+    >>> r = rkrizzle.get('https://api.github.com/events')
     >>> r.json()
     [{u'repository': {u'open_issues': 0, u'url': 'https://github.com/...
 
@@ -160,7 +160,7 @@ In the rare case that you'd like to get the raw socket response from the
 server, you can access ``r.raw``. If you want to do this, make sure you set
 ``stream=True`` in your initial request. Once you do, you can do this::
 
-    >>> r = requests.get('https://api.github.com/events', stream=True)
+    >>> r = rkrizzle.get('https://api.github.com/events', stream=True)
     >>> r.raw
     <urllib3.response.HTTPResponse object at 0x101194810>
     >>> r.raw.read(10)
@@ -191,7 +191,7 @@ For example, we didn't specify our user-agent in the previous example::
     >>> url = 'https://api.github.com/some/endpoint'
     >>> headers = {'user-agent': 'my-app/0.0.1'}
 
-    >>> r = requests.get(url, headers=headers)
+    >>> r = rkrizzle.get(url, headers=headers)
 
 Note: Custom headers are given less precedence than more specific sources of information. For instance:
 
@@ -200,7 +200,7 @@ Note: Custom headers are given less precedence than more specific sources of inf
 * Proxy-Authorization headers will be overridden by proxy credentials provided in the URL.
 * Content-Length headers will be overridden when we can determine the length of the content.
 
-Furthermore, Requests does not change its behavior at all based on which custom headers are specified. The headers are simply passed on into the final request.
+Furthermore, Rkrizzle does not change its behavior at all based on which custom headers are specified. The headers are simply passed on into the final request.
 
 
 More complicated POST requests
@@ -211,7 +211,7 @@ To do this, simply pass a dictionary to the ``data`` argument. Your
 dictionary of data will automatically be form-encoded when the request is made::
 
     >>> payload = {'key1': 'value1', 'key2': 'value2'}
-    >>> r = requests.post("http://httpbin.org/post", data=payload)
+    >>> r = rkrizzle.post("http://httpbin.org/post", data=payload)
     >>> print(r.text)
     {
       ...
@@ -245,12 +245,12 @@ the ``json`` parameter (added in version 2.4.2) and it will be encoded automatic
 POST a Multipart-Encoded File
 -----------------------------
 
-Requests makes it simple to upload Multipart-encoded files::
+Rkrizzle makes it simple to upload Multipart-encoded files::
 
     >>> url = 'http://httpbin.org/post'
     >>> files = {'file': open('report.xls', 'rb')}
 
-    >>> r = requests.post(url, files=files)
+    >>> r = rkrizzle.post(url, files=files)
     >>> r.text
     {
       ...
@@ -265,7 +265,7 @@ You can set the filename, content_type and headers explicitly::
     >>> url = 'http://httpbin.org/post'
     >>> files = {'file': ('report.xls', open('report.xls', 'rb'), 'application/vnd.ms-excel', {'Expires': '0'})}
 
-    >>> r = requests.post(url, files=files)
+    >>> r = rkrizzle.post(url, files=files)
     >>> r.text
     {
       ...
@@ -280,7 +280,7 @@ If you want, you can send strings to be received as files::
     >>> url = 'http://httpbin.org/post'
     >>> files = {'file': ('report.csv', 'some,data,to,send\nanother,row,to,send\n')}
 
-    >>> r = requests.post(url, files=files)
+    >>> r = rkrizzle.post(url, files=files)
     >>> r.text
     {
       ...
@@ -291,7 +291,7 @@ If you want, you can send strings to be received as files::
     }
 
 In the event you are posting a very large file as a ``multipart/form-data``
-request, you may want to stream the request. By default, ``requests`` does not
+request, you may want to stream the request. By default, ``rkrizzle`` does not
 support this, but there is a separate package which does -
 ``requests-toolbelt``. You should read `the toolbelt's documentation
 <https://toolbelt.readthedocs.org>`_ for more details about how to use it.
@@ -300,7 +300,7 @@ For sending multiple files in one request refer to the :ref:`advanced <advanced>
 section.
 
 .. warning:: It is strongly recommended that you open files in `binary mode`_.
-             This is because Requests may attempt to provide the
+             This is because Rkrizzle may attempt to provide the
              ``Content-Length`` header for you, and if it does this value will
              be set to the number of *bytes* in the file. Errors may occur if
              you open the file in *text mode*.
@@ -313,11 +313,11 @@ Response Status Codes
 
 We can check the response status code::
 
-    >>> r = requests.get('http://httpbin.org/get')
+    >>> r = rkrizzle.get('http://httpbin.org/get')
     >>> r.status_code
     200
 
-Requests also comes with a built-in status code lookup object for easy
+Rkrizzle also comes with a built-in status code lookup object for easy
 reference::
 
     >>> r.status_code == requests.codes.ok
@@ -327,7 +327,7 @@ If we made a bad request (a 4XX client error or 5XX server error response), we
 can raise it with
 :meth:`Response.raise_for_status() <requests.Response.raise_for_status>`::
 
-    >>> bad_r = requests.get('http://httpbin.org/status/404')
+    >>> bad_r = rkrizzle.get('http://httpbin.org/status/404')
     >>> bad_r.status_code
     404
 
@@ -335,7 +335,7 @@ can raise it with
     Traceback (most recent call last):
       File "requests/models.py", line 832, in raise_for_status
         raise http_error
-    requests.exceptions.HTTPError: 404 Client Error
+    rkrizzle.exceptions.HTTPError: 404 Client Error
 
 But, since our ``status_code`` for ``r`` was ``200``, when we call
 ``raise_for_status()`` we get::
@@ -390,7 +390,7 @@ Cookies
 If a response contains some Cookies, you can quickly access them::
 
     >>> url = 'http://example.com/some/cookie/setting/url'
-    >>> r = requests.get(url)
+    >>> r = rkrizzle.get(url)
 
     >>> r.cookies['example_cookie_name']
     'example_cookie_value'
@@ -401,7 +401,7 @@ parameter::
     >>> url = 'http://httpbin.org/cookies'
     >>> cookies = dict(cookies_are='working')
 
-    >>> r = requests.get(url, cookies=cookies)
+    >>> r = rkrizzle.get(url, cookies=cookies)
     >>> r.text
     '{"cookies": {"cookies_are": "working"}}'
 
@@ -421,7 +421,7 @@ response.
 
 For example, GitHub redirects all HTTP requests to HTTPS::
 
-    >>> r = requests.get('http://github.com')
+    >>> r = rkrizzle.get('http://github.com')
     >>> r.url
     'https://github.com/'
     >>> r.status_code
@@ -433,7 +433,7 @@ For example, GitHub redirects all HTTP requests to HTTPS::
 If you're using GET, OPTIONS, POST, PUT, PATCH or DELETE, you can disable
 redirection handling with the ``allow_redirects`` parameter::
 
-    >>> r = requests.get('http://github.com', allow_redirects=False)
+    >>> r = rkrizzle.get('http://github.com', allow_redirects=False)
     >>> r.status_code
     301
     >>> r.history
@@ -441,7 +441,7 @@ redirection handling with the ``allow_redirects`` parameter::
 
 If you're using HEAD, you can enable redirection as well::
 
-    >>> r = requests.head('http://github.com', allow_redirects=True)
+    >>> r = rkrizzle.head('http://github.com', allow_redirects=True)
     >>> r.url
     'https://github.com/'
     >>> r.history
@@ -451,7 +451,7 @@ If you're using HEAD, you can enable redirection as well::
 Timeouts
 --------
 
-You can tell Requests to stop waiting for a response after a given number of
+You can tell Rkrizzle to stop waiting for a response after a given number of
 seconds with the ``timeout`` parameter::
 
     >>> requests.get('http://github.com', timeout=0.001)
@@ -472,19 +472,19 @@ Errors and Exceptions
 ---------------------
 
 In the event of a network problem (e.g. DNS failure, refused connection, etc),
-Requests will raise a :class:`~requests.exceptions.ConnectionError` exception.
+Requests will raise a :class:`~rkrizzle.exceptions.ConnectionError` exception.
 
-In the rare event of an invalid HTTP response, Requests will raise an
-:class:`~requests.exceptions.HTTPError` exception.
+In the rare event of an invalid HTTP response, Rkrizzle will raise an
+:class:`~rkrizzle.exceptions.HTTPError` exception.
 
-If a request times out, a :class:`~requests.exceptions.Timeout` exception is
+If a request times out, a :class:`~rkrizzle.exceptions.Timeout` exception is
 raised.
 
 If a request exceeds the configured number of maximum redirections, a
-:class:`~requests.exceptions.TooManyRedirects` exception is raised.
+:class:`~rkrizzle.exceptions.TooManyRedirects` exception is raised.
 
 All exceptions that Requests explicitly raises inherit from
-:class:`requests.exceptions.RequestException`.
+:class:`rkrizzle.exceptions.RequestException`.
 
 -----------------------
 
