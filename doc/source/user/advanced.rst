@@ -3,7 +3,7 @@
 Advanced Usage
 ==============
 
-This document covers some of Requests more advanced features.
+This document covers some of Rkrizzle's more advanced features.
 
 .. _session-objects:
 
@@ -17,11 +17,11 @@ you're making several requests to the same host, the underlying TCP
 connection will be reused, which can result in a significant performance
 increase (see `HTTP persistent connection`_).
 
-A Session object has all the methods of the main Requests API.
+A Session object has all the methods of the main Rkrizzle API.
 
 Let's persist some cookies across requests::
 
-    s = requests.Session()
+    s = rkrizzle.Session()
 
     s.get('http://httpbin.org/cookies/set/sessioncookie/123456789')
     r = s.get("http://httpbin.org/cookies")
@@ -33,7 +33,7 @@ Let's persist some cookies across requests::
 Rkrizzle can also be used to provide default data to the request methods. This
 is done by providing data to the properties on a Session object::
 
-    s = requests.Session()
+    s = rkrizzle.Session()
     s.auth = ('user', 'pass')
     s.headers.update({'x-test': 'true'})
 
@@ -49,7 +49,7 @@ Note, however, that method-level parameters will *not* be persisted across
 requests, even if using a session. This example will only send the cookies
 with the first request, but not the second::
 
-    s = requests.Session()
+    s = rkrizzle.Session()
     r = s.get('http://httpbin.org/cookies', cookies={'from-my': 'browser'})
     print(r.text)
     # '{"cookies": {"from-my": "browser"}}'
@@ -61,11 +61,11 @@ with the first request, but not the second::
 
 If you want to manually add cookies to your session, use the
 :ref:`Cookie utility functions <api-cookies>` to manipulate
-:attr:`Session.cookies <requests.Session.cookies>`.
+:attr:`Session.cookies <rkrizzle.Session.cookies>`.
 
 Rkrizzle can also be used as context managers::
 
-    with requests.Session() as s:
+    with rkrizzle.Session() as s:
         s.get('http://httpbin.org/cookies/set/sessioncookie/123456789')
 
 This will make sure the session is closed as soon as the ``with`` block is
@@ -86,15 +86,15 @@ See the :ref:`Session API Docs <sessionapi>` to learn more.
 Request and Response Objects
 ----------------------------
 
-Whenever a call is made to ``requests.get()`` and friends you are doing two
+Whenever a call is made to ``rkrizzle.get()`` and friends you are doing two
 major things. First, you are constructing a ``Request`` object which will be
 sent off to a server to request or query some resource. Second, a ``Response``
-object is generated once ``requests`` gets a response back from the server.
+object is generated once ``rkrizzle`` gets a response back from the server.
 The Response object contains all of the information returned by the server and
 also contains the ``Request`` object you created originally. Here is a simple
 request to get some very important information from Wikipedia's servers::
 
-    >>> r = requests.get('http://en.wikipedia.org/wiki/Monty_Python')
+    >>> r = rkrizzle.get('http://en.wikipedia.org/wiki/Monty_Python')
 
 If we want to access the headers the server sent back to us, we do this::
 
@@ -113,20 +113,20 @@ request, and then the request's headers::
 
     >>> r.request.headers
     {'Accept-Encoding': 'identity, deflate, compress, gzip',
-    'Accept': '*/*', 'User-Agent': 'python-requests/1.2.0'}
+    'Accept': '*/*', 'User-Agent': 'rkrizzle/2.8.2'}
 
 .. _prepared-requests:
 
 Prepared Requests
 -----------------
 
-Whenever you receive a :class:`Response <requests.Response>` object
+Whenever you receive a :class:`Response <rkrizzle.Response>` object
 from an API call or a Session call, the ``request`` attribute is actually the
 ``PreparedRequest`` that was used. In some cases you may wish to do some extra
 work to the body or headers (or anything else really) before sending a
 request. The simple recipe for this is the following::
 
-    from requests import Request, Session
+    from rkrizzle import Request, Session
 
     s = Session()
     req = Request('GET', url,
@@ -150,19 +150,19 @@ request. The simple recipe for this is the following::
 
 Since you are not doing anything special with the ``Request`` object, you
 prepare it immediately and modify the ``PreparedRequest`` object. You then
-send that with the other parameters you would have sent to ``requests.*`` or
+send that with the other parameters you would have sent to ``rkrizzle.*`` or
 ``Session.*``.
 
-However, the above code will lose some of the advantages of having a Requests
-:class:`Session <requests.Session>` object. In particular,
-:class:`Session <requests.Session>`-level state such as cookies will
+However, the above code will lose some of the advantages of having a Rkrizzle
+:class:`Session <rkrizzle.Session>` object. In particular,
+:class:`Session <rkrizzle.Session>`-level state such as cookies will
 not get applied to your request. To get a
-:class:`PreparedRequest <requests.PreparedRequest>` with that state
+:class:`PreparedRequest <rkrizzle.PreparedRequest>` with that state
 applied, replace the call to :meth:`Request.prepare()
-<requests.Request.prepare>` with a call to
-:meth:`Session.prepare_request() <requests.Session.prepare_request>`, like this::
+<rkrizzle.Request.prepare>` with a call to
+:meth:`Session.prepare_request() <rkrizzle.Session.prepare_request>`, like this::
 
-    from requests import Request, Session
+    from rkrizzle import Request, Session
 
     s = Session()
     req = Request('GET',  url,
@@ -190,42 +190,44 @@ applied, replace the call to :meth:`Request.prepare()
 SSL Cert Verification
 ---------------------
 
-Requests can verify SSL certificates for HTTPS requests, just like a web browser.
-To check a host's SSL certificate, you can use the ``verify`` argument::
+Rkrizzle verifies SSL certificates for HTTPS requests, just like a web
+browser::
 
-    >>> requests.get('https://kennethreitz.com', verify=True)
-    requests.exceptions.SSLError: hostname 'kennethreitz.com' doesn't match either of '*.herokuapp.com', 'herokuapp.com'
+    >>> rkrizzle.get('https://kennethreitz.com')
+    rkrizzle.exceptions.SSLError: hostname 'kennethreitz.com' doesn't match either of '*.herokuapp.com', 'herokuapp.com'
 
-I don't have SSL setup on this domain, so it fails. Excellent. GitHub does though::
+I don't have SSL setup on this domain, so it fails. Excellent. If I know
+what I'm doing, I can disable verification::
 
-    >>> requests.get('https://github.com', verify=True)
+    >>> rkrizzle.get('https://kennethreitz.com', verify=False)
     <Response [200]>
 
-You can pass ``verify`` the path to a CA_BUNDLE file or directory with certificates of trusted CAs::
+GitHub has SSL, good for them!::
 
-    >>> requests.get('https://github.com', verify='/path/to/certfile')
-
-This list of trusted CAs can also be specified through the ``REQUESTS_CA_BUNDLE`` environment variable.
-
-Requests can also ignore verifying the SSL certificate if you set ``verify`` to False.
-
-::
-
-    >>> requests.get('https://kennethreitz.com', verify=False)
+    >>> rkrizzle.get('https://github.com')
     <Response [200]>
 
-By default, ``verify`` is set to True. Option ``verify`` only applies to host certs.
+You can pass ``verify`` the path to a CA_BUNDLE file or directory with
+certificates of trusted CAs::
+
+    >>> rkrizzle.get('https://github.com', verify='/path/to/certfile')
+
+This list of trusted CAs can also be specified through the
+``REQUESTS_CA_BUNDLE`` environment variable.
+
+By default, ``verify`` is set to True. Option ``verify`` only applies to host
+certs.
 
 You can also specify a local cert to use as client side certificate, as a single
 file (containing the private key and the certificate) or as a tuple of both
 file's path::
 
-    >>> requests.get('https://kennethreitz.com', cert=('/path/server.crt', '/path/key'))
+    >>> rkrizzle.get('https://kennethreitz.com', cert=('/path/server.crt', '/path/key'))
     <Response [200]>
 
 If you specify a wrong path or an invalid cert::
 
-    >>> requests.get('https://kennethreitz.com', cert='/wrong_path/server.pem')
+    >>> rkrizzle.get('https://kennethreitz.com', cert='/wrong_path/server.pem')
     SSLError: [Errno 336265225] _ssl.c:347: error:140B0009:SSL routines:SSL_CTX_use_PrivateKey_file:PEM lib
 
 .. _ca-certificates:
@@ -233,22 +235,18 @@ If you specify a wrong path or an invalid cert::
 CA Certificates
 ---------------
 
-By default Requests bundles a set of root CAs that it trusts, sourced from the
-`Mozilla trust store`_. However, these are only updated once for each Requests
-version. This means that if you pin a Requests version your certificates can
-become extremely out of date.
+Rkrizzle uses root CAs that are installed on the system if you're on Linux.
+However, on OSX and Windows, the situation is trickier.
 
-From Requests version 2.4.0 onwards, Requests will attempt to use certificates
-from `certifi`_ if it is present on the system. This allows for users to update
-their trusted certificates without having to change the code that runs on their
-system.
+On Windows and OSX, Rkrizzle will use certificates from `certifi`_. This allows
+for users to update their trusted certificates without having to change the
+code that runs on their system.
 
 For the sake of security we recommend upgrading certifi frequently!
 
 .. _HTTP persistent connection: https://en.wikipedia.org/wiki/HTTP_persistent_connection
 .. _connection pooling: https://urllib3.readthedocs.org/en/latest/pools.html
 .. _certifi: http://certifi.io/
-.. _Mozilla trust store: https://hg.mozilla.org/mozilla-central/raw-file/tip/security/nss/lib/ckfw/builtins/certdata.txt
 
 .. _body-content-workflow:
 
@@ -257,11 +255,11 @@ Body Content Workflow
 
 By default, when you make a request, the body of the response is downloaded
 immediately. You can override this behaviour and defer downloading the response
-body until you access the :class:`Response.content <requests.Response.content>`
+body until you access the :class:`Response.content <rkrizzle.Response.content>`
 attribute with the ``stream`` parameter::
 
-    tarball_url = 'https://github.com/kennethreitz/requests/tarball/master'
-    r = requests.get(tarball_url, stream=True)
+    tarball_url = 'https://github.com/kennethreitz/rkrizzle/tarball/master'
+    r = rkrizzle.get(tarball_url, stream=True)
 
 At this point only the response headers have been downloaded and the connection
 remains open, hence allowing us to make content retrieval conditional::
@@ -270,22 +268,22 @@ remains open, hence allowing us to make content retrieval conditional::
       content = r.content
       ...
 
-You can further control the workflow by use of the :class:`Response.iter_content <requests.Response.iter_content>`
-and :class:`Response.iter_lines <requests.Response.iter_lines>` methods.
+You can further control the workflow by use of the :class:`Response.iter_content <rkrizzle.Response.iter_content>`
+and :class:`Response.iter_lines <rkrizzle.Response.iter_lines>` methods.
 Alternatively, you can read the undecoded body from the underlying
 urllib3 :class:`urllib3.HTTPResponse <urllib3.response.HTTPResponse>` at
-:class:`Response.raw <requests.Response.raw>`.
+:class:`Response.raw <rkrizzle.Response.raw>`.
 
 If you set ``stream`` to ``True`` when making a request, Requests cannot
 release the connection back to the pool unless you consume all the data or call
-:class:`Response.close <requests.Response.close>`. This can lead to
+:class:`Response.close <rkrizzle.Response.close>`. This can lead to
 inefficiency with connections. If you find yourself partially reading request
 bodies (or not reading them at all) while using ``stream=True``, you should
 consider using ``contextlib.closing`` (`documented here`_), like this::
 
     from contextlib import closing
 
-    with closing(requests.get('http://httpbin.org/get', stream=True)) as r:
+    with closing(rkrizzle.get('http://httpbin.org/get', stream=True)) as r:
         # Do things with the response here.
 
 .. _`documented here`: http://docs.python.org/2/library/contextlib.html#contextlib.closing
@@ -313,7 +311,7 @@ files without reading them into memory. To stream and upload, simply provide a
 file-like object for your body::
 
     with open('massive-body', 'rb') as f:
-        requests.post('http://some.url/streamed', data=f)
+        rkrizzle.post('http://some.url/streamed', data=f)
 
 .. warning:: It is strongly recommended that you open files in `binary mode`_.
              This is because Requests may attempt to provide the
@@ -337,10 +335,10 @@ a length) for your body::
         yield 'hi'
         yield 'there'
 
-    requests.post('http://some.url/chunked', data=gen())
+    rkrizzle.post('http://some.url/chunked', data=gen())
 
 For chunked encoded responses, it's best to iterate over the data using
-:meth:`Response.iter_content() <requests.models.Response.iter_content>`. In
+:meth:`Response.iter_content() <rkrizzle.models.Response.iter_content>`. In
 an ideal situation you'll have set ``stream=True`` on the request, in which
 case you can iterate chunk-by-chunk by calling ``iter_content`` with a chunk
 size parameter of ``None``. If you want to set a maximum size of the chunk,
@@ -362,7 +360,7 @@ To do that, just set files to a list of tuples of (form_field_name, file_info):
     >>> url = 'http://httpbin.org/post'
     >>> multiple_files = [('images', ('foo.png', open('foo.png', 'rb'), 'image/png')),
                           ('images', ('bar.png', open('bar.png', 'rb'), 'image/png'))]
-    >>> r = requests.post(url, files=multiple_files)
+    >>> r = rkrizzle.post(url, files=multiple_files)
     >>> r.text
     {
       ...
@@ -416,7 +414,7 @@ anything, nothing else is effected.
 
 Let's print some request method arguments at runtime::
 
-    >>> requests.get('http://httpbin.org', hooks=dict(response=print_url))
+    >>> rkrizzle.get('http://httpbin.org', hooks=dict(response=print_url))
     http://httpbin.org
     <Response [200]>
 
@@ -430,16 +428,16 @@ Requests allows you to use specify your own authentication mechanism.
 Any callable which is passed as the ``auth`` argument to a request method will
 have the opportunity to modify the request before it is dispatched.
 
-Authentication implementations are subclasses of ``requests.auth.AuthBase``,
+Authentication implementations are subclasses of ``rkrizzle.auth.AuthBase``,
 and are easy to define. Requests provides two common authentication scheme
-implementations in ``requests.auth``: ``HTTPBasicAuth`` and ``HTTPDigestAuth``.
+implementations in ``rkrizzle.auth``: ``HTTPBasicAuth`` and ``HTTPDigestAuth``.
 
 Let's pretend that we have a web service that will only respond if the
 ``X-Pizza`` header is set to a password value. Unlikely, but just go with it.
 
 ::
 
-    from requests.auth import AuthBase
+    from rkrizzle.auth import AuthBase
 
     class PizzaAuth(AuthBase):
         """Attaches HTTP Pizza Authentication to the given Request object."""
@@ -454,7 +452,7 @@ Let's pretend that we have a web service that will only respond if the
 
 Then, we can make a request using our Pizza Auth::
 
-    >>> requests.get('http://pizzabin.org/admin', auth=PizzaAuth('kenneth'))
+    >>> rkrizzle.get('http://pizzabin.org/admin', auth=PizzaAuth('kenneth'))
     <Response [200]>
 
 .. _streaming-requests:
@@ -462,16 +460,16 @@ Then, we can make a request using our Pizza Auth::
 Streaming Requests
 ------------------
 
-With :class:`requests.Response.iter_lines()` you can easily
+With :class:`rkrizzle.Response.iter_lines()` you can easily
 iterate over streaming APIs such as the `Twitter Streaming
 API <https://dev.twitter.com/streaming/overview>`_. Simply
 set ``stream`` to ``True`` and iterate over the response with
-:class:`~requests.Response.iter_lines()`::
+:class:`~rkrizzle.Response.iter_lines()`::
 
     import json
-    import requests
+    import rkrizzle
 
-    r = requests.get('http://httpbin.org/stream/20', stream=True)
+    r = rkrizzle.get('http://httpbin.org/stream/20', stream=True)
 
     for line in r.iter_lines():
 
@@ -481,7 +479,7 @@ set ``stream`` to ``True`` and iterate over the response with
 
 .. warning::
 
-    :class:`~requests.Response.iter_lines()` is not reentrant safe.
+    :class:`~rkrizzle.Response.iter_lines()` is not reentrant safe.
     Calling this method multiple times causes some of the received data
     being lost. In case you need to call it from multiple places, use
     the resulting iterator object instead::
@@ -500,14 +498,14 @@ Proxies
 If you need to use a proxy, you can configure individual requests with the
 ``proxies`` argument to any request method::
 
-    import requests
+    import rkrizzle
 
     proxies = {
       "http": "http://10.10.1.10:3128",
       "https": "http://10.10.1.10:1080",
     }
 
-    requests.get("http://example.org", proxies=proxies)
+    rkrizzle.get("http://example.org", proxies=proxies)
 
 You can also configure proxies by setting the environment variables
 ``HTTP_PROXY`` and ``HTTPS_PROXY``.
@@ -517,8 +515,8 @@ You can also configure proxies by setting the environment variables
     $ export HTTP_PROXY="http://10.10.1.10:3128"
     $ export HTTPS_PROXY="http://10.10.1.10:1080"
     $ python
-    >>> import requests
-    >>> requests.get("http://example.org")
+    >>> import rkrizzle
+    >>> rkrizzle.get("http://example.org")
 
 To use HTTP Basic Auth with your proxy, use the `http://user:password@host/` syntax::
 
@@ -553,7 +551,7 @@ Encodings
 
 When you receive a response, Requests makes a guess at the encoding to
 use for decoding the response when you access the :attr:`Response.text
-<requests.Response.text>` attribute. Requests will first check for an
+<rkrizzle.Response.text>` attribute. Requests will first check for an
 encoding in the HTTP header, and if none is present, will use `chardet
 <http://pypi.python.org/pypi/chardet>`_ to attempt to guess the encoding.
 
@@ -563,8 +561,8 @@ header contains ``text``. In this situation, `RFC 2616
 <http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.7.1>`_ specifies
 that the default charset must be ``ISO-8859-1``. Requests follows the
 specification in this case. If you require a different encoding, you can
-manually set the :attr:`Response.encoding <requests.Response.encoding>`
-property, or use the raw :attr:`Response.content <requests.Response.content>`.
+manually set the :attr:`Response.encoding <rkrizzle.Response.encoding>`
+property, or use the raw :attr:`Response.content <rkrizzle.Response.content>`.
 
 .. _http-verbs:
 
@@ -582,19 +580,19 @@ example usage would be attempting to get information about a specific commit
 from GitHub. Suppose we wanted commit ``a050faf`` on Requests. We would get it
 like so::
 
-    >>> import requests
-    >>> r = requests.get('https://api.github.com/repos/kennethreitz/requests/git/commits/a050faf084662f3a352dd1a941f2c7c9f886d4ad')
+    >>> import rkrizzle
+    >>> r = rkrizzle.get('https://api.github.com/repos/kennethreitz/rkrizzle/git/commits/a050faf084662f3a352dd1a941f2c7c9f886d4ad')
 
 We should confirm that GitHub responded correctly. If it has, we want to work
 out what type of content it is. Do this like so::
 
-    >>> if r.status_code == requests.codes.ok:
+    >>> if r.status_code == rkrizzle.codes.ok:
     ...     print(r.headers['content-type'])
     ...
     application/json; charset=utf-8
 
 So, GitHub returns JSON. That's great, we can use the :meth:`r.json
-<requests.Response.json>` method to parse it into Python objects.
+<rkrizzle.Response.json>` method to parse it into Python objects.
 
 ::
 
@@ -613,7 +611,7 @@ see what kinds of HTTP methods are supported on the url we just used.
 
 ::
 
-    >>> verbs = requests.options(r.url)
+    >>> verbs = rkrizzle.options(r.url)
     >>> verbs.status_code
     500
 
@@ -625,7 +623,7 @@ headers, e.g.
 
 ::
 
-    >>> verbs = requests.options('http://a-good-website.com/api/cats')
+    >>> verbs = rkrizzle.options('http://a-good-website.com/api/cats')
     >>> print(verbs.headers['allow'])
     GET,HEAD,POST,OPTIONS
 
@@ -639,7 +637,7 @@ already exists, we will use it as an example. Let's start by getting it.
 
 ::
 
-    >>> r = requests.get('https://api.github.com/repos/kennethreitz/requests/issues/482')
+    >>> r = rkrizzle.get('https://api.github.com/repos/kennethreitz/rkrizzle/issues/482')
     >>> r.status_code
     200
     >>> issue = json.loads(r.text)
@@ -652,7 +650,7 @@ Cool, we have three comments. Let's take a look at the last of them.
 
 ::
 
-    >>> r = requests.get(r.url + u'/comments')
+    >>> r = rkrizzle.get(r.url + u'/comments')
     >>> r.status_code
     200
     >>> comments = r.json()
@@ -676,8 +674,8 @@ is to POST to the thread. Let's do it.
 ::
 
     >>> body = json.dumps({u"body": u"Sounds great! I'll get right on it!"})
-    >>> url = u"https://api.github.com/repos/kennethreitz/requests/issues/482/comments"
-    >>> r = requests.post(url=url, data=body)
+    >>> url = u"https://api.github.com/repos/kennethreitz/rkrizzle/issues/482/comments"
+    >>> r = rkrizzle.post(url=url, data=body)
     >>> r.status_code
     404
 
@@ -687,9 +685,9 @@ the very common Basic Auth.
 
 ::
 
-    >>> from requests.auth import HTTPBasicAuth
+    >>> from rkrizzle.auth import HTTPBasicAuth
     >>> auth = HTTPBasicAuth('fake@example.com', 'not_a_real_password')
-    >>> r = requests.post(url=url, data=body, auth=auth)
+    >>> r = rkrizzle.post(url=url, data=body, auth=auth)
     >>> r.status_code
     201
     >>> content = r.json()
@@ -706,8 +704,8 @@ that.
     >>> print(content[u"id"])
     5804413
     >>> body = json.dumps({u"body": u"Sounds great! I'll get right on it once I feed my cat."})
-    >>> url = u"https://api.github.com/repos/kennethreitz/requests/issues/comments/5804413"
-    >>> r = requests.patch(url=url, data=body, auth=auth)
+    >>> url = u"https://api.github.com/repos/kennethreitz/rkrizzle/issues/comments/5804413"
+    >>> r = rkrizzle.patch(url=url, data=body, auth=auth)
     >>> r.status_code
     200
 
@@ -718,7 +716,7 @@ DELETE method. Let's get rid of it.
 
 ::
 
-    >>> r = requests.delete(url=url, auth=auth)
+    >>> r = rkrizzle.delete(url=url, auth=auth)
     >>> r.status_code
     204
     >>> r.headers['status']
@@ -731,7 +729,7 @@ headers.
 
 ::
 
-    >>> r = requests.head(url=url, auth=auth)
+    >>> r = rkrizzle.head(url=url, auth=auth)
     >>> print(r.headers)
     ...
     'x-ratelimit-remaining': '4995'
@@ -753,7 +751,7 @@ GitHub uses these for `pagination <http://developer.github.com/v3/#pagination>`_
 in their API, for example::
 
     >>> url = 'https://api.github.com/users/kennethreitz/repos?page=1&per_page=10'
-    >>> r = requests.head(url=url)
+    >>> r = rkrizzle.head(url=url)
     >>> r.headers['link']
     '<https://api.github.com/users/kennethreitz/repos?page=2&per_page=10>; rel="next", <https://api.github.com/users/kennethreitz/repos?page=6&per_page=10>; rel="last"'
 
@@ -777,10 +775,10 @@ methods for an HTTP service. In particular, they allow you to apply per-service
 configuration.
 
 Requests ships with a single Transport Adapter, the :class:`HTTPAdapter
-<requests.adapters.HTTPAdapter>`. This adapter provides the default Requests
+<rkrizzle.adapters.HTTPAdapter>`. This adapter provides the default Requests
 interaction with HTTP and HTTPS using the powerful `urllib3`_ library. Whenever
-a Requests :class:`Session <requests.Session>` is initialized, one of these is
-attached to the :class:`Session <requests.Session>` object for HTTP, and one
+a Requests :class:`Session <rkrizzle.Session>` is initialized, one of these is
+attached to the :class:`Session <rkrizzle.Session>` object for HTTP, and one
 for HTTPS.
 
 Requests enables users to create and use their own Transport Adapters that
@@ -790,7 +788,7 @@ it should apply to.
 
 ::
 
-    >>> s = requests.Session()
+    >>> s = rkrizzle.Session()
     >>> s.mount('http://www.github.com', MyAdapter())
 
 The mount call registers a specific instance of a Transport Adapter to a
@@ -800,7 +798,7 @@ with the given prefix will use the given Transport Adapter.
 Many of the details of implementing a Transport Adapter are beyond the scope of
 this documentation, but take a look at the next example for a simple SSL use-
 case. For more than that, you might look at subclassing
-``requests.adapters.BaseAdapter``.
+``rkrizzle.adapters.BaseAdapter``.
 
 Example: Specific SSL Version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -819,7 +817,7 @@ SSLv3:
 
     import ssl
 
-    from requests.adapters import HTTPAdapter
+    from rkrizzle.adapters import HTTPAdapter
     from urllib3.poolmanager import PoolManager
 
 
@@ -841,7 +839,7 @@ Blocking Or Non-Blocking?
 -------------------------
 
 With the default Transport Adapter in place, Requests does not provide any kind
-of non-blocking IO. The :attr:`Response.content <requests.Response.content>`
+of non-blocking IO. The :attr:`Response.content <rkrizzle.Response.content>`
 property will block until the entire response has been downloaded. If
 you require more granularity, the streaming features of the library (see
 :ref:`streaming-requests`) allow you to retrieve smaller quantities of the
@@ -877,12 +875,12 @@ time before the server sends the first byte).
 
 If you specify a single value for the timeout, like this::
 
-    r = requests.get('https://github.com', timeout=5)
+    r = rkrizzle.get('https://github.com', timeout=5)
 
 The timeout value will be applied to both the ``connect`` and the ``read``
 timeouts. Specify a tuple if you would like to set the values separately::
 
-    r = requests.get('https://github.com', timeout=(3.05, 27))
+    r = rkrizzle.get('https://github.com', timeout=(3.05, 27))
 
 If the remote server is very slow, you can tell Requests to wait forever for
 a response, by passing None as a timeout value and then retrieving a cup of
@@ -890,6 +888,6 @@ coffee.
 
 .. code-block:: python
 
-    r = requests.get('https://github.com', timeout=None)
+    r = rkrizzle.get('https://github.com', timeout=None)
 
 .. _`connect()`: http://linux.die.net/man/2/connect

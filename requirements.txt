@@ -5,3 +5,5 @@ chardet>=2.3.0
 pyOpenSSL>=0.13
 ndg-httpsclient>=0.4.0
 pyasn1>=0.1.9
+certifi;sys_platform=='darwin'
+certifi;sys_platform=='win32'
