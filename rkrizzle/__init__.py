@@ -56,8 +56,9 @@ __author__ = 'Kenneth Reitz'
 __license__ = 'Apache 2.0'
 __copyright__ = 'Copyright 2015 Kenneth Reitz'
 
-from urllib3.contrib import pyopenssl
-pyopenssl.inject_into_urllib3()
+if sys.version_info.major == 2:
+    from urllib3.contrib import pyopenssl
+    pyopenssl.inject_into_urllib3()
 import urllib3.exceptions
 
 __all__ = (
