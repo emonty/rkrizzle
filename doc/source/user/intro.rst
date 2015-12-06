@@ -32,7 +32,7 @@ as people who believe in freedom, we'd like to affirm our positive take on
 
 .. _`GPL`: http://www.opensource.org/licenses/gpl-license.php
 .. _`Apache2 License`: http://opensource.org/licenses/Apache-2.0
-.. _'The Four Freedoms`: http://www.gnu.org/philosophy/free-sw.en.html
+.. _`The Four Freedoms`: http://www.gnu.org/philosophy/free-sw.en.html
 
 Requests License
 ----------------
