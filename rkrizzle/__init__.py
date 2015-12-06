@@ -48,6 +48,7 @@ is at <http://rkrizzle.readthedocs.org>
 
 """
 import pbr.version
+import sys
 
 __title__ = 'rkrizzle'
 __version__ = pbr.version.VersionInfo('rkrizzle').version_string()
