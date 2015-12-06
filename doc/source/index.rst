@@ -33,7 +33,6 @@ Requests ecosystem and community.
 
    community/faq
    community/recommended
-   community/out-there
    community/support
    community/vulnerabilities
    community/release-process
