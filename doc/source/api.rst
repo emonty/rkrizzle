@@ -119,7 +119,7 @@ Classes
 
 .. _sessionapi:
 
-.. autoclass:: sessions.Session
+.. autoclass:: rkrizzle.Session
    :inherited-members:
 
 .. autoclass:: rkrizzle.adapters.HTTPAdapter
@@ -150,7 +150,7 @@ API Changes
 
   ::
 
-      s = sessions.Session()    # formerly, session took parameters
+      s = rkrizzle.Session()    # formerly, session took parameters
       s.auth = auth
       s.headers.update(headers)
       r = s.get('http://httpbin.org/headers')

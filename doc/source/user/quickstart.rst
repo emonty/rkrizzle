@@ -11,8 +11,6 @@ with Requests.
 First, make sure that:
 
 * Requests is :ref:`installed <install>`
-* Requests is :ref:`up-to-date <updates>`
-
 
 Let's get started with some simple examples.
 
