@@ -55,7 +55,7 @@ Features
 
 - International Domains and URLs
 - Keep-Alive & Connection Pooling
-- Rkrizzle with Cookie Persistence
+- Sessions with Cookie Persistence
 - Browser-style SSL Verification
 - Basic/Digest Authentication
 - Elegant Key/Value Cookies
